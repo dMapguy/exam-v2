@@ -1,0 +1,34 @@
+---
+import AssetCard from "@/components/AssetCard.astro";
+import Layout from "@/layouts/Main.astro";
+import { ASSET_URL, type Asset } from "@/lib/assets";
+import { PlusCircle } from "lucide-astro";
+
+export const prerender = false;
+
+const games: Asset[] = await (await fetch(`${ASSET_URL}/json/games.min.json`)).json();
+const customGames = (Astro.cookies.get("asset.game")?.json() as Asset[]) ?? [];
+
+const all = [...customGames, ...games].sort((a, b) => {
+  if (a.custom && !b.custom) return -1;
+  if (!a.custom && b.custom) return 1;
+  return a.name.localeCompare(b.name);
+});
+---
+
+<Layout>
+  <div class="flex justify-center py-8 flex-col items-center gap-4 mt-24">
+    <div class="flex px-4 py-3 rounded-md border-2 border-border overflow-hidden w-1/4 h-14 mx-auto">
+      <input id="search" placeholder="Search Games" class="w-full outline-none bg-transparent text-text text-sm" />
+    </div>
+    <button class="p-4 bg-interactive hover:bg-interactive-secondary rounded-md font-semibold inline-flex items-center" data-type="game" id="add-asset">
+      <PlusCircle class="size-5 mr-2" />
+      Add Game
+    </button>
+    <div id="container" class="flex flex-wrap justify-center gap-4 flex-row mt-30">
+      {all.map((game) => <AssetCard asset={game} />)}
+    </div>
+  </div>
+</Layout>
+
+<script src="@/lib/assets.ts"></script>
