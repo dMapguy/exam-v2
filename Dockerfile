@@ -1,14 +1,12 @@
-FROM node:bookworm-slim AS builder
+FROM node:bookworm-slim
 ENV NODE_ENV=production
 
 WORKDIR /app
 
-RUN npm install -g pnpm
+COPY ["package.json", "./"]
 
-COPY ["package.json", "pnpm-lock.yaml*", "./"]
-
-RUN pnpm install
+RUN npm install
 
 COPY . .
 
-RUN pnpm build
+CMD [ "node", "index.js" ]
